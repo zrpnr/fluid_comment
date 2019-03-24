@@ -1,0 +1,8 @@
+name: Fluid Comments
+type: module
+description: Enhances the user experience of your site's comment system.
+package: Core
+core: 8.x
+dependencies:
+  - drupal:jsonapi
+  - drupal:comment

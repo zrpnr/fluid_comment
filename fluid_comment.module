@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Fluid Comments module.
+ *
+ * @DCG
+ * This file is no longer required in Drupal 8.
+ * @see https://www.drupal.org/node/2217931
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\user\EntityOwnerInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function fluid_comment_theme($existing, $type, $theme, $path) {
+  return [
+    'fluid_comment_formatter' => [
+      'variables' => [
+        'comment_target_type' => NULL,
+        'comment_target_id' => NULL,
+        'comment_type' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function fluid_comment_comment_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  assert($entity instanceof EntityOwnerInterface);
+  switch ($operation) {
+    case 'view':
+      return AccessResult::allowedIf($account->hasPermission('access comments') && !$account->isAnonymous() && $entity->getOwnerId() == $account->id())->cachePerUser();
+
+    default:
+      return AccessResult::neutral();
+  }
+}
+
+/**
+ * Implements hook_jsonapi_ENTITY_TYPE_filter_access() for 'comment'.
+ */
+function fluid_comment_jsonapi_comment_filter_access(EntityTypeInterface $entity_type, AccountInterface $account) {
+  return ([
+    JSONAPI_FILTER_AMONG_OWN => AccessResult::allowedIfHasPermission($account, 'access comments')->andIf(AccessResult::allowedIf(!$account->isAnonymous())->addCacheContexts(['user.roles:anonymous'])),
+  ]);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function fluid_comment_comment_presave(EntityInterface $entity) {
+  assert($entity instanceof EntityOwnerInterface);
+  if (!$entity->getOwnerId()) {
+    $entity->setOwnerId(\Drupal::currentUser()->id());
+  }
+}
