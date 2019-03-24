@@ -1,12 +1,13 @@
 'use strict';
 
 import React from 'react';
-import { getDeepProp } from './functions.js';
+import { getDeepProp, getResponseDocument } from './functions.js';
 
 class FluidComment extends React.Component {
 
   constructor(props) {
     super(props);
+    this.deleteComment = this.deleteComment.bind(this);
   }
 
   render() {
@@ -30,8 +31,18 @@ class FluidComment extends React.Component {
         <article style={style}>
           <h3>{ subject }</h3>
           <div dangerouslySetInnerHTML={{__html: body}}></div>
+          <ul>
+            <a href="_blank" onClick={this.deleteComment}>Delete</a>
+          </ul>
         </article>
     );
+  }
+
+  deleteComment(event) {
+    event.preventDefault();
+    getResponseDocument(getDeepProp(this.props.comment, 'links.self.href'), {method: 'DELETE'}).then(() => {
+      this.props.onDelete();
+    });
   }
 
 }
