@@ -15,6 +15,8 @@ class FluidComment extends React.Component {
     const subject = getDeepProp(comment, 'attributes.subject');
     const body = getDeepProp(comment, 'attributes.comment_body.processed');
     const published = getDeepProp(comment, 'attributes.status');
+    const selfLink = getDeepProp(comment, 'links.self');
+    const deletable = selfLink.hasOwnProperty('rel') && selfLink['rel'].includes('delete');
     const style = {
       borderLeft: '1px solid grey',
       paddingLeft: '1em',
@@ -31,9 +33,9 @@ class FluidComment extends React.Component {
         <article style={style}>
           <h3>{ subject }</h3>
           <div dangerouslySetInnerHTML={{__html: body}}></div>
-          <ul>
+          {deletable && <ul>
             <a href="_blank" onClick={this.deleteComment}>Delete</a>
-          </ul>
+          </ul>}
         </article>
     );
   }
