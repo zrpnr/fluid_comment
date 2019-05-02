@@ -4,8 +4,8 @@ import React from 'react';
 import FluidCommentWrapper from './FluidCommentWrapper';
 import { getDeepProp, getResponseDocument } from "./functions";
 
-const loginUrl = 'http://dbug.test/user/login?_format=json';
-const entryPointUrl = 'http://dbug.test/jsonapi';
+const loginUrl = _functions.getUrl('/user/login?_format=json');
+const entryPointUrl = _functions.getUrl('/jsonapi');
 
 class FluidCommentWidget extends React.Component {
 
