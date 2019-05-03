@@ -87,18 +87,19 @@ class FluidCommentWrapper extends React.Component {
     })
   }
 
-  getAndAddComments(commentsUrl) {
+  getAndAddComments(commentsUrl, previous = []) {
 
     getResponseDocument(commentsUrl).then(doc => {
       const data = getDeepProp(doc, 'data');
       const included = getDeepProp(doc, 'included');
       const nextUrl = getDeepProp(doc, 'links.next.href');
 
+      const comments = [...previous, ...this.mergeIncluded(data, included)];
+
       if (nextUrl) {
-        this.getAndAddComments(nextUrl, data);
+        this.getAndAddComments(nextUrl, comments);
       }
       else {
-        const comments = this.mergeIncluded(data, included);
         this.setState({ comments });
       }
     });
